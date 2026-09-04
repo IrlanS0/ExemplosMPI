@@ -4,7 +4,6 @@
 int main(int argc, char* argv[]) {
     int my_rank, comm_size;
     int numero;
-    irlaiznasçdf
 
     MPI_Init(&argc, &argv);                  // Inicializa MPI
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank); // Rank do processo atual
