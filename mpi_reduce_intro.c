@@ -1,29 +1,27 @@
-#include <mpi.h>
 #include <stdio.h>
+#include <mpi.h>
 
-int main(int argc, char** argv) {
-    MPI_Init(&argc, &argv);
+int main(int argc, char* argv[]) {
+    int my_rank, comm_size;
+    int numero;
+    int a = 2, b = 3, tot = 0, r, acc;
 
-    int rank, size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Init(&argc, &argv);                  // Inicializa MPI
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank); // Rank do processo atual
 
-    int local_value = rank + 1;  // Cada processo tem um valor diferente (1, 2, 3, ...)
+    if (my_rank == 0) tot = a + b;
+    else if (my_rank == 1) tot = b - a;
+    else if (my_rank == 2) tot = a * b;
+    else if (my_rank == 3) tot = a - b; 
+    r = tot; 
+    int global_sum = 0;
+
+    // Soma todos os 'local_value' no processo 0
+    MPI_Reduce(&r, &global_sum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&global_sum, 1, MPI_INT, 0, MPI_COMM_WORLD);
     
-    if (rank == 0) {
-        int global_sum = local_value; // Inicializa com o valor local
-        // Processo raiz (0) recebe dados de todos os outros processos
-        int received_value;
-        for (int i = 1; i < size; i++) {
-            MPI_Recv(&received_value, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            global_sum += received_value;
-        }
-        printf("Soma global = %d\n", global_sum);
-    } else {
-        // Outros processos enviam seus valores para o processo raiz
-        MPI_Send(&local_value, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-    }
+    printf("Processo %d calculou: %.2f\n", my_rank, (double)global_sum/r);
 
-    MPI_Finalize();
+    MPI_Finalize(); // Finaliza MPI
     return 0;
 }
