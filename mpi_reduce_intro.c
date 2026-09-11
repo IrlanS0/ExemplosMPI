@@ -9,9 +9,9 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     int local_value = rank + 1;  // Cada processo tem um valor diferente (1, 2, 3, ...)
-    int global_sum = local_value; // Inicializa com o valor local
-
+    
     if (rank == 0) {
+        int global_sum = local_value; // Inicializa com o valor local
         // Processo raiz (0) recebe dados de todos os outros processos
         int received_value;
         for (int i = 1; i < size; i++) {
